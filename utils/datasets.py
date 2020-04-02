@@ -38,19 +38,28 @@ def random_resize(images, min_size=288, max_size=448):
 
 class ImageFolder(Dataset):
     def __init__(self, folder_path, img_size=416):
+        self.rgb_folder = os.path.join(folder_path, "visible/")
+        self.thermal_folder = os.path.join(folder_path, "lwir/")
         self.files = sorted(glob.glob("%s/*.*" % folder_path))
+        self.rgb_files = sorted(glob.glob("%s/*.*" % self.rgb_folder))
+        self.thermal_files = sorted(glob.glob("%s/*.*" % self.thermal_folder))
         self.img_size = img_size
 
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
+        rgb_path = self.rgb_files[index % len(self.rgb_files)]
+        thermal_path = self.thermal_files[index % len(self.thermal_files)]
         # Extract image as PyTorch tensor
-        img = transforms.ToTensor()(Image.open(img_path))
+        img = transforms.ToTensor()(Image.open(rgb_path).convert('RGB'))
+        thermal_img = transforms.ToTensor()(Image.open(thermal_path).convert('L'))
+        img.putalpha(thermal_img)
+
         # Pad to square resolution
         img, _ = pad_to_square(img, 0)
         # Resize
         img = resize(img, self.img_size)
 
-        return img_path, img
+        return rgb_path, thermal_path, img
 
     def __len__(self):
         return len(self.files)
@@ -60,7 +69,8 @@ class ListDataset(Dataset):
     def __init__(self, list_path, img_size=416, augment=True, multiscale=True, normalized_labels=True):
         with open(list_path, "r") as file:
             self.img_files = file.readlines()
-
+        self.rgb_path = [path[:-6] + "visible/" + path[-6:] for path in self.img_files]
+        self.thermal_path = [path[:-6] + "lwir/" + path[-6:] for path in self.img_files]
         self.label_files = [
             path.replace("images", "labels").replace(".png", ".txt").replace(".jpg", ".txt")
             for path in self.img_files
@@ -81,14 +91,16 @@ class ListDataset(Dataset):
         # ---------
 
         img_path = self.img_files[index % len(self.img_files)].rstrip()
-
+        rgb_path = img_path[:-6] + "visible/" + img_path[-6:]
+        thermal_path = img_path[:-6] + "lwir/" + img_path[-6:]
         # Extract image as PyTorch tensor
-        img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
-
+        img = transforms.ToTensor()(Image.open(rgb_path).convert('RGB'))
+        thermal_img = transforms.ToTensor()(Image.open(thermal_path).convert('L'))
+        img.putalpha(thermal_img)
         # Handle images with less than three channels
-        if len(img.shape) != 3:
+        if len(img.shape) != 4:
             img = img.unsqueeze(0)
-            img = img.expand((3, img.shape[1:]))
+            img = img.expand((4, img.shape[1:]))
 
         _, h, w = img.shape
         h_factor, w_factor = (h, w) if self.normalized_labels else (1, 1)
@@ -129,10 +141,10 @@ class ListDataset(Dataset):
             if np.random.random() < 0.5:
                 img, targets = horisontal_flip(img, targets)
 
-        return img_path, img, targets
+        return rgb_path, thermal_path, img, targets
 
     def collate_fn(self, batch):
-        paths, imgs, targets = list(zip(*batch))
+        rgb_path, thermal_path, imgs, targets = list(zip(*batch))
         # Remove empty placeholder targets
         targets = [boxes for boxes in targets if boxes is not None]
         # Add sample index to targets
@@ -145,7 +157,7 @@ class ListDataset(Dataset):
         # Resize images to input shape
         imgs = torch.stack([resize(img, self.img_size) for img in imgs])
         self.batch_count += 1
-        return paths, imgs, targets
+        return rgb_path, thermal_path, imgs, targets
 
     def __len__(self):
         return len(self.img_files)
