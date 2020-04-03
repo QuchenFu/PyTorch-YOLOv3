@@ -91,16 +91,17 @@ class ListDataset(Dataset):
         # ---------
 
         img_path = self.img_files[index % len(self.img_files)].rstrip()
-        rgb_path = img_path[:-6] + "visible/" + img_path[-6:]
-        thermal_path = img_path[:-6] + "lwir/" + img_path[-6:]
+        rgb_path = "data/custom/images/" + img_path[:-6] + "visible/" + img_path[-6:] + ".jpg"
+        thermal_path = "data/custom/images/" + img_path[:-6] + "lwir/" + img_path[-6:] + ".jpg"
         # Extract image as PyTorch tensor
-        img = transforms.ToTensor()(Image.open(rgb_path).convert('RGB'))
-        thermal_img = transforms.ToTensor()(Image.open(thermal_path).convert('L'))
+        img = Image.open(rgb_path).convert('RGBA')
+        thermal_img = Image.open(thermal_path).convert('L')
         img.putalpha(thermal_img)
+        img=transforms.ToTensor()(img)
         # Handle images with less than three channels
-        if len(img.shape) != 4:
-            img = img.unsqueeze(0)
-            img = img.expand((4, img.shape[1:]))
+        # if len(img.shape) != 4:
+        #     img = img.unsqueeze(0)
+        #     img = img.expand((4, img.shape[1:]))
 
         _, h, w = img.shape
         h_factor, w_factor = (h, w) if self.normalized_labels else (1, 1)
@@ -112,7 +113,7 @@ class ListDataset(Dataset):
         #  Label
         # ---------
 
-        label_path = self.label_files[index % len(self.img_files)].rstrip()
+        label_path = "data/custom/labels/" + self.label_files[index % len(self.img_files)].rstrip() + ".txt"
 
         targets = None
         if os.path.exists(label_path):

@@ -1,0 +1,2 @@
+% bbGt version=3
+person 569 234 68 189 0 0 0 0 0 0 0

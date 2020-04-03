@@ -1,0 +1,2 @@
+% bbGt version=3
+person 581 217 45 77 0 0 0 0 0 0 0

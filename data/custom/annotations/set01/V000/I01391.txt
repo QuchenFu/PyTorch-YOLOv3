@@ -1,0 +1,2 @@
+% bbGt version=3
+person 534 206 24 81 0 0 0 0 0 0 0

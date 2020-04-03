@@ -1,0 +1,2 @@
+% bbGt version=3
+person 596 213 41 70 0 0 0 0 0 0 0

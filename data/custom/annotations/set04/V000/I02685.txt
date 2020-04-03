@@ -1,0 +1,2 @@
+% bbGt version=3
+people 501 211 84 54 0 0 0 0 0 0 0

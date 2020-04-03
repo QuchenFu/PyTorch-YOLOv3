@@ -1,0 +1,2 @@
+% bbGt version=3
+person 302 204 41 74 0 0 0 0 0 0 0

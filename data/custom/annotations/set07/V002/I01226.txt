@@ -1,0 +1,2 @@
+% bbGt version=3
+person 598 199 26 44 2 0 0 0 0 0 0

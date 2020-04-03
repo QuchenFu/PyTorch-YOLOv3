@@ -1,0 +1,2 @@
+% bbGt version=3
+people 401 217 35 53 0 0 0 0 0 0 0

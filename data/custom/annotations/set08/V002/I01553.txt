@@ -1,0 +1,3 @@
+% bbGt version=3
+people 553 201 87 98 0 0 0 0 0 0 0
+person 584 216 31 80 1 0 0 0 0 0 0

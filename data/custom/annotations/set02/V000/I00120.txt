@@ -1,0 +1,2 @@
+% bbGt version=3
+people 336 214 160 53 0 0 0 0 0 0 0

@@ -1,0 +1,2 @@
+% bbGt version=3
+person 605 231 35 116 0 0 0 0 0 0 0
