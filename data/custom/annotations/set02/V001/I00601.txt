@@ -1,2 +1,0 @@
-% bbGt version=3
-person 409 227 79 174 0 0 0 0 0 0 0

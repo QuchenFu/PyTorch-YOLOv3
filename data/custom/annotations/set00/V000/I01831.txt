@@ -1,2 +1,0 @@
-% bbGt version=3
-cyclist 566 238 74 180 0 0 0 0 0 0 0

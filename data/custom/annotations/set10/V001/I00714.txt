@@ -1,2 +1,0 @@
-% bbGt version=3
-people 595 221 21 43 0 0 0 0 0 0 0
